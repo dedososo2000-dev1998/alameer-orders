@@ -125,17 +125,23 @@ address:document.getElementById("address").value.trim(),
 landmark:document.getElementById("landmark").value.trim(),
 price:document.getElementById("price").value.trim()
 };
-google.script.run
-.withSuccessHandler(function(response){
-document.getElementById("orderForm").style.display="none";
-result.innerHTML="✅ تم تسجيل طلبك بنجاح<br><br><span style='color:#ead39f;font-size:21px'>🆔 رقم الطلب: #"+response.orderNumber+"</span><br><br>💍 شكراً لاختياركم الأمير للفضيات ❤️<br>✨ نسعد بخدمتكم دائماً ونحرص على تقديم الأفضل لكم.";
+fetch("https://script.google.com/macros/s/AKfycbxTepXEeOw0McSTQ2em23gvaD0XlApV3Bp-4ASEV2Z0682yh7TBFqc3UJO_XyMkFDE6Eg/exec", {
+method: "POST",
+mode: "no-cors",
+headers: {
+"Content-Type": "text/plain;charset=utf-8"
+},
+body: JSON.stringify(data)
 })
-.withFailureHandler(function(error){
+.then(function(){
+document.getElementById("orderForm").style.display="none";
+result.innerHTML="✅ تم تسجيل طلبك بنجاح<br><br>💍 شكراً لاختياركم الأمير للفضيات ❤️<br>✨ نسعد بخدمتكم دائماً ونحرص على تقديم الأفضل لكم.";
+})
+.catch(function(error){
 button.disabled=false;
 button.innerText="تثبيت الطلب 💍";
 result.innerText="❌ حدث خطأ، يرجى المحاولة مرة أخرى.";
-})
-.saveWebOrder(data);
+});
 });
 </script>
 </body>
