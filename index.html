@@ -203,12 +203,34 @@ font-size:11px;
 <label>✍️ الحفر الليزري</label>
 <input type="text" id="engraving" placeholder="اكتب المطلوب أو: لا يوجد" required>
 
-<label>📍 المحافظة</label>
-<input type="text" id="city" placeholder="مثال: أربيل" required>
-
-<label>🏠 العنوان بالتفصيل</label>
+<label>📍 المحافظة *</label>
+<select id="city" required>
+  <option value="">اختر المحافظة</option>
+  <option value="1">بغداد</option>
+  <option value="2">كربلاء</option>
+  <option value="3">الأنبار - الرمادي</option>
+  <option value="4">الحلة - بابل</option>
+  <option value="5">البصرة</option>
+  <option value="6">دهوك</option>
+  <option value="7">ديالى</option>
+  <option value="8">أربيل</option>
+  <option value="9">كركوك</option>
+  <option value="10">العمارة - ميسان</option>
+  <option value="11">السماوة - المثنى</option>
+  <option value="12">النجف</option>
+  <option value="13">نينوى</option>
+  <option value="14">الديوانية - القادسية</option>
+  <option value="15">صلاح الدين - تكريت</option>
+  <option value="16">السليمانية</option>
+  <option value="17">الناصرية - ذي قار</option>
+  <option value="18">الكوت - واسط</option>
+</select>
+<label>📍 المنطقة *</label>
+<select id="region" required disabled>
+  <option value="">اختر المحافظة أولاً</option>
+</select>
+<label>🏠 العنوان بالتفصيل *</label>
 <textarea id="address" placeholder="اكتب عنوان التوصيل بالتفصيل" required></textarea>
-
 <label>📌 أقرب نقطة دالة</label>
 <input type="text" id="landmark" placeholder="مثال: قرب جامع / سوق / شارع">
 
