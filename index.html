@@ -100,8 +100,7 @@ button:disabled{opacity:.6}
 
 <button type="submit" id="submitBtn">تثبيت الطلب 💍</button>
 </form>
-
-<div id="result"></div>
+  <div id="result"></div
 
 <a class="whatsapp" href="https://wa.me/9647514603890" target="_blank">📞 للاستفسار عبر واتساب: 07514603890</a>
 <div class="footer">الأمير للفضيات — ثقة وجودة ✨</div>
@@ -135,6 +134,7 @@ body: JSON.stringify(data)
 })
 .then(function(){
 document.getElementById("orderForm").style.display="none";
+  document.querySelector(".card").style.display="none";
 result.innerHTML="✅ تم تسجيل طلبك بنجاح<br><br>💍 شكراً لاختياركم الأمير للفضيات ❤️<br>✨ نسعد بخدمتكم دائماً ونحرص على تقديم الأفضل لكم.<br><br>📞 للاستفسار عبر واتساب: <a href='https://wa.me/9647514603890' target='_blank'>07514603890</a>";
 })
 .catch(function(error){
