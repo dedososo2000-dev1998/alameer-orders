@@ -258,7 +258,56 @@ font-size:11px;
 </div>
 
 <script>
+document.getElementById("city").addEventListener("change", function(){
 
+  const cityId = this.value;
+  const region = document.getElementById("region");
+
+  region.innerHTML = '<option value="">جاري تحميل المناطق...</option>';
+  region.disabled = true;
+
+  if (!cityId) {
+    region.innerHTML = '<option value="">اختر المحافظة أولاً</option>';
+    return;
+  }
+
+  const oldScript = document.getElementById("regionsScript");
+  if (oldScript) oldScript.remove();
+
+  const script = document.createElement("script");
+  script.id = "regionsScript";
+
+  window.receiveRegions = function(data) {
+
+    region.innerHTML = '<option value="">اختر المنطقة</option>';
+
+    if (!data || !data.length) {
+      region.innerHTML = '<option value="">لا توجد مناطق</option>';
+      return;
+    }
+
+    data.forEach(function(item){
+
+      const option = document.createElement("option");
+
+      option.value = item.id;
+      option.textContent = item.region_name;
+
+      region.appendChild(option);
+
+    });
+
+    region.disabled = false;
+  };
+
+  script.src =
+    "https://script.google.com/macros/s/AKfycbxTepXEeOw0McSTQ2em23gvaD0XlApV3Bp-4ASEV2Z0682yh7TBFqc3UJO_XyMkFDE6Eg/exec" +
+    "?action=regions&city_id=" + encodeURIComponent(cityId) +
+    "&callback=receiveRegions";
+
+  document.body.appendChild(script);
+
+});
 document.getElementById("orderForm").addEventListener("submit",function(e){
 
 e.preventDefault();
