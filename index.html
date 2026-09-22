@@ -435,13 +435,7 @@ function showRegions(regions) {
   regionResults.style.display = "block";
 }
 
-document.addEventListener("click", function(e){
 
-  if (!e.target.closest(".region-box")) {
-    regionResults.style.display = "none";
-  }
-
-});
 document.getElementById("orderForm").addEventListener("submit",function(e){
 
 e.preventDefault();
