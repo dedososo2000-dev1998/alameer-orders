@@ -335,11 +335,28 @@ function loadRegions(cityId, callback) {
     return;
   }
 
+  const saved = localStorage.getItem("regions_" + cityId);
+
+  if (saved) {
+    try {
+      regionCache[cityId] = JSON.parse(saved) || [];
+      callback(regionCache[cityId]);
+      return;
+    } catch(e) {}
+  }
+
   const callbackName = "receiveRegions_" + cityId + "_" + Date.now();
 
   window[callbackName] = function(data) {
 
     regionCache[cityId] = data || [];
+
+    try {
+      localStorage.setItem(
+        "regions_" + cityId,
+        JSON.stringify(regionCache[cityId])
+      );
+    } catch(e) {}
 
     delete window[callbackName];
 
@@ -353,25 +370,46 @@ function loadRegions(cityId, callback) {
     "?action=regions&city_id=" + encodeURIComponent(cityId) +
     "&callback=" + callbackName;
 
+  script.onerror = function() {
+    delete window[callbackName];
+    callback([]);
+  };
+
   document.body.appendChild(script);
 }
 
 
-// تحميل المناطق مسبقاً حتى يكون الاختيار سريع
-function preloadRegions() {
+// تحميل بغداد أولاً مباشرة لأنها الأكثر استخداماً
+loadRegions("1", function(data) {});
+
+
+// بعد تحميل الصفحة، نبدأ تحميل باقي المحافظات بالخلفية
+// حتى لا نضغط على السيرفر دفعة واحدة
+window.addEventListener("load", function() {
 
   const cities = document.getElementById("city").options;
 
-  for (let i = 0; i < cities.length; i++) {
+  let index = 0;
 
-    const cityId = cities[i].value;
+  function preloadNext() {
 
-    if (cityId) {
-      loadRegions(cityId, function(){});
+    if (index >= cities.length) return;
+
+    const cityId = cities[index].value;
+    index++;
+
+    if (!cityId || cityId === "1") {
+      setTimeout(preloadNext, 100);
+      return;
     }
 
+    loadRegions(cityId, function(){});
+
+    setTimeout(preloadNext, 300);
   }
-}
+
+  setTimeout(preloadNext, 500);
+});
 
 
 // اختيار المحافظة
@@ -392,7 +430,7 @@ document.getElementById("city").addEventListener("change", function(){
     return;
   }
 
-  regionInput.placeholder = "اختر المنطقة...";
+  regionInput.placeholder = "جاري تحميل المناطق...";
 
   loadRegions(cityId, function(data) {
 
@@ -405,14 +443,12 @@ document.getElementById("city").addEventListener("change", function(){
     }
 
     regionInput.disabled = false;
+    regionInput.placeholder = "اختر المنطقة...";
 
   });
 
 });
 
-
-// بدء تحميل المناطق مسبقاً
-preloadRegions();
 
 regionInput.addEventListener("input", function(){
 
@@ -432,6 +468,7 @@ regionInput.addEventListener("input", function(){
 
 });
 
+
 regionInput.addEventListener("focus", function(){
 
   if (allRegions.length) {
@@ -439,6 +476,7 @@ regionInput.addEventListener("focus", function(){
   }
 
 });
+
 
 function showRegions(regions) {
 
@@ -502,7 +540,6 @@ city: document.getElementById("city").options[document.getElementById("city").se
 region: document.getElementById("regionInput").value.trim(),
 region_id: document.getElementById("region").value.trim(),
 
-
 landmark:document.getElementById("landmark").value.trim(),
 
 price:document.getElementById("price").value.trim()
@@ -512,13 +549,10 @@ price:document.getElementById("price").value.trim()
 fetch("https://script.google.com/macros/s/AKfycbxTepXEeOw0McSTQ2em23gvaD0XlApV3Bp-4ASEV2Z0682yh7TBFqc3UJO_XyMkFDE6Eg/exec",{
 
 method:"POST",
-
 mode:"no-cors",
-
 headers:{
 "Content-Type":"text/plain;charset=utf-8"
 },
-
 body:JSON.stringify(data)
 
 })
@@ -526,7 +560,7 @@ body:JSON.stringify(data)
 .then(function(){
 
 document.getElementById("orderForm").style.display="none";
-  document.querySelector(".subtitle").style.display="none";
+document.querySelector(".subtitle").style.display="none";
 document.querySelector(".gold-line").style.display="none";
 document.querySelector(".badges").style.display="none";
 document.querySelector(".whatsapp").style.display="none";
@@ -542,19 +576,15 @@ result.innerHTML=
 "<a href='https://wa.me/9647514603890' target='_blank'>07514603890</a>";
 
 })
-
 .catch(function(error){
 
 button.disabled=false;
-
 button.innerText="تثبيت الطلب 💍";
-
 result.innerText="❌ حدث خطأ، يرجى المحاولة مرة أخرى.";
 
 });
 
 });
-
 </script>
 
 </body>
