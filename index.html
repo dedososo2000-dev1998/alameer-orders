@@ -326,6 +326,55 @@ const regionInput = document.getElementById("regionInput");
 const regionResults = document.getElementById("regionResults");
 const region = document.getElementById("region");
 
+const regionCache = {};
+
+function loadRegions(cityId, callback) {
+
+  if (regionCache[cityId]) {
+    callback(regionCache[cityId]);
+    return;
+  }
+
+  const callbackName = "receiveRegions_" + cityId + "_" + Date.now();
+
+  window[callbackName] = function(data) {
+
+    regionCache[cityId] = data || [];
+
+    delete window[callbackName];
+
+    callback(regionCache[cityId]);
+  };
+
+  const script = document.createElement("script");
+
+  script.src =
+    "https://script.google.com/macros/s/AKfycbxTepXEeOw0McSTQ2em23gvaD0XlApV3Bp-4ASEV2Z0682yh7TBFqc3UJO_XyMkFDE6Eg/exec" +
+    "?action=regions&city_id=" + encodeURIComponent(cityId) +
+    "&callback=" + callbackName;
+
+  document.body.appendChild(script);
+}
+
+
+// تحميل المناطق مسبقاً حتى يكون الاختيار سريع
+function preloadRegions() {
+
+  const cities = document.getElementById("city").options;
+
+  for (let i = 0; i < cities.length; i++) {
+
+    const cityId = cities[i].value;
+
+    if (cityId) {
+      loadRegions(cityId, function(){});
+    }
+
+  }
+}
+
+
+// اختيار المحافظة
 document.getElementById("city").addEventListener("change", function(){
 
   const cityId = this.value;
@@ -345,13 +394,7 @@ document.getElementById("city").addEventListener("change", function(){
 
   regionInput.placeholder = "اختر المنطقة...";
 
-  const oldScript = document.getElementById("regionsScript");
-  if (oldScript) oldScript.remove();
-
-  const script = document.createElement("script");
-  script.id = "regionsScript";
-
-  window.receiveRegions = function(data) {
+  loadRegions(cityId, function(data) {
 
     allRegions = data || [];
 
@@ -362,16 +405,14 @@ document.getElementById("city").addEventListener("change", function(){
     }
 
     regionInput.disabled = false;
-  };
 
-  script.src =
-    "https://script.google.com/macros/s/AKfycbxTepXEeOw0McSTQ2em23gvaD0XlApV3Bp-4ASEV2Z0682yh7TBFqc3UJO_XyMkFDE6Eg/exec" +
-    "?action=regions&city_id=" + encodeURIComponent(cityId) +
-    "&callback=receiveRegions";
-
-  document.body.appendChild(script);
+  });
 
 });
+
+
+// بدء تحميل المناطق مسبقاً
+preloadRegions();
 
 regionInput.addEventListener("input", function(){
 
