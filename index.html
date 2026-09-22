@@ -226,6 +226,13 @@ font-size:11px;
   <option value="18">الكوت - واسط</option>
 </select>
 <label>📍 المنطقة *</label>
+  <input
+  type="text"
+  id="regionSearch"
+  placeholder="🔎 ابحث عن المنطقة..."
+  autocomplete="off"
+  disabled
+>
 <select id="region" required disabled>
   <option value="">اختر المحافظة أولاً</option>
 </select>
@@ -258,11 +265,16 @@ font-size:11px;
 </div>
 
 <script>
+  let allRegions = [];
 document.getElementById("city").addEventListener("change", function(){
 
-  const cityId = this.value;
-  const region = document.getElementById("region");
+ const cityId = this.value;
+const region = document.getElementById("region");
+const regionSearch = document.getElementById("regionSearch");
 
+regionSearch.value = "";
+regionSearch.disabled = true;
+allRegions = [];
   region.innerHTML = '<option value="">جاري تحميل المناطق...</option>';
   region.disabled = true;
 
@@ -277,28 +289,31 @@ document.getElementById("city").addEventListener("change", function(){
   const script = document.createElement("script");
   script.id = "regionsScript";
 
-  window.receiveRegions = function(data) {
+window.receiveRegions = function(data) {
 
-    region.innerHTML = '<option value="">اختر المنطقة</option>';
+  allRegions = data || [];
 
-    if (!data || !data.length) {
-      region.innerHTML = '<option value="">لا توجد مناطق</option>';
-      return;
-    }
+  region.innerHTML = '<option value="">اختر المنطقة</option>';
 
-    data.forEach(function(item){
+  if (!allRegions.length) {
+    region.innerHTML = '<option value="">لا توجد مناطق</option>';
+    return;
+  }
 
-      const option = document.createElement("option");
+  allRegions.forEach(function(item){
 
-      option.value = item.id;
-      option.textContent = item.region_name;
+    const option = document.createElement("option");
 
-      region.appendChild(option);
+    option.value = item.id;
+    option.textContent = item.region_name;
 
-    });
+    region.appendChild(option);
 
-    region.disabled = false;
-  };
+  });
+
+  region.disabled = false;
+  regionSearch.disabled = false;
+};
 
   script.src =
     "https://script.google.com/macros/s/AKfycbxTepXEeOw0McSTQ2em23gvaD0XlApV3Bp-4ASEV2Z0682yh7TBFqc3UJO_XyMkFDE6Eg/exec" +
@@ -306,6 +321,38 @@ document.getElementById("city").addEventListener("change", function(){
     "&callback=receiveRegions";
 
   document.body.appendChild(script);
+
+});
+  document.getElementById("regionSearch").addEventListener("input", function(){
+
+  const searchText = this.value.trim().toLowerCase();
+  const region = document.getElementById("region");
+
+  const filteredRegions = allRegions.filter(function(item){
+
+    return item.region_name
+      .toLowerCase()
+      .includes(searchText);
+
+  });
+
+  region.innerHTML = '<option value="">اختر المنطقة</option>';
+
+  if (!filteredRegions.length) {
+    region.innerHTML = '<option value="">لا توجد منطقة بهذا الاسم</option>';
+    return;
+  }
+
+  filteredRegions.forEach(function(item){
+
+    const option = document.createElement("option");
+
+    option.value = item.id;
+    option.textContent = item.region_name;
+
+    region.appendChild(option);
+
+  });
 
 });
 document.getElementById("orderForm").addEventListener("submit",function(e){
