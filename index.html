@@ -463,8 +463,10 @@ product:document.getElementById("product").value.trim(),
 
 engraving:document.getElementById("engraving").value.trim(),
 
-city:document.getElementById("city").value.trim(),
-  region_id:document.getElementById("region").value.trim(),
+city: document.getElementById("city").options[document.getElementById("city").selectedIndex].text.trim(),
+
+region: document.getElementById("regionInput").value.trim(),
+region_id: document.getElementById("region").value.trim(),
 
 address:document.getElementById("address").value.trim(),
 
